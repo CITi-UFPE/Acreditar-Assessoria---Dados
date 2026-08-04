@@ -26,7 +26,7 @@ jobs:
 
       - name: Enviar para DocuData
         run: |
-          curl -f -X POST "${{ secrets.DOCUDATA_API_URL }}/ingest" \
+          curl -f -X POST "https://agente-documentador-production.up.railway.app/ingest" \
             -F "projeto_id=${{ env.DOCUDATA_PROJECT_ID }}" \
             -F "sprint_numero=${{ env.DOCUDATA_SPRINT_NUMERO }}" \
             -F "arquivo=@commit_info.txt;type=text/plain"
