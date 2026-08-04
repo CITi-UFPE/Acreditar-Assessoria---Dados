@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  DOCUDATA_PROJECT_ID: 835c4d00-255c-4000-afa8-4e3ebbf6be42
+  DOCUDATA_PROJECT_ID: 636c4d60-255c-4000-afa9-4e3ebbf6be42
   DOCUDATA_SPRINT_NUMERO: 1
 
 jobs:
