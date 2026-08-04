@@ -19,7 +19,7 @@ jobs:
       - name: Enviar commit para DocuData
         run: |
           COMMIT_HASH=$(git log -1 --pretty=format:"%H")
-          COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          COMMIT_MSG=$(git log -1 --pretty=format:"%B")
           AUTHOR=$(git log -1 --pretty=format:"%an")
           DATE=$(git log -1 --pretty=format:"%ad")
           DIFF_STAT=$(git diff HEAD~1 HEAD --stat)
