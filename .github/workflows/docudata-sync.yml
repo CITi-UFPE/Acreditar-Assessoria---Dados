@@ -16,17 +16,24 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Gerar resumo do commit
+      - name: Enviar commit para DocuData
         run: |
-          git log -1 --pretty=format:"Commit: %H%nAutor: %an%nData: %ad%nMensagem: %s%n%n%b" > commit_info.txt
-          echo -e "\n\n--- ARQUIVOS ALTERADOS ---\n" >> commit_info.txt
-          git diff HEAD~1 HEAD --name-status >> commit_info.txt
-          echo -e "\n\n--- DIFF (primeiras 500 linhas) ---\n" >> commit_info.txt
-          git diff HEAD~1 HEAD -- '*.py' '*.ts' '*.tsx' '*.js' | head -500 >> commit_info.txt
+          COMMIT_HASH=$(git log -1 --pretty=format:"%H")
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          AUTHOR=$(git log -1 --pretty=format:"%an")
+          DATE=$(git log -1 --pretty=format:"%ad")
+          DIFF_STAT=$(git diff HEAD~1 HEAD --stat)
+          DIFF=$(git diff HEAD~1 HEAD -- '*.py' '*.ts' '*.tsx' '*.js' '*.sql' | head -500)
 
-      - name: Enviar para DocuData
-        run: |
-          curl -f -X POST "https://agente-documentador-production.up.railway.app/ingest" \
-            -F "projeto_id=${{ env.DOCUDATA_PROJECT_ID }}" \
-            -F "sprint_numero=${{ env.DOCUDATA_SPRINT_NUMERO }}" \
-            -F "arquivo=@commit_info.txt;type=text/plain"
+          curl -f -X POST "https://agente-documentador-production.up.railway.app/ingest/commit" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg project_id "$DOCUDATA_PROJECT_ID" \
+              --argjson sprint "$DOCUDATA_SPRINT_NUMERO" \
+              --arg hash "$COMMIT_HASH" \
+              --arg msg "$COMMIT_MSG" \
+              --arg author "$AUTHOR" \
+              --arg date "$DATE" \
+              --arg stat "$DIFF_STAT" \
+              --arg diff "$DIFF" \
+              '{project_id: $project_id, sprint_number: $sprint, commit_hash: $hash, commit_message: $msg, author: $author, date: $date, diff_stat: $stat, diff: $diff}')"
